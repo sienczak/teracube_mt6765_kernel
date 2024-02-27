@@ -11,6 +11,8 @@
 #include <linux/irqreturn.h>
 #include <linux/dcache.h>
 
+#define MTK_EMIMPU_DBG_ENABLE		1
+
 #define MTK_EMIMPU_NO_PROTECTION	0
 #define MTK_EMIMPU_SEC_RW		1
 #define MTK_EMIMPU_SEC_RW_NSEC_R	2

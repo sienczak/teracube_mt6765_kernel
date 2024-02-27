@@ -13,9 +13,9 @@
 # See http://www.gnu.org/licenses/gpl-2.0.html for more details.
 
 import os, sys
+import string
 import time
 import re
-import string
 
 from utility import version
 from utility.util import log

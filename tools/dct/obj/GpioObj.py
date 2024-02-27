@@ -15,19 +15,19 @@
 import re
 import os
 import sys
-import string
-import ConfigParser
+import configparser
 import xml.dom.minidom
 
 
 from data.GpioData import GpioData
 from data.EintData import EintData
-from ModuleObj import ModuleObj
-import ChipObj
+from .ModuleObj import ModuleObj
+from obj import ChipObj
 from utility.util import compare
 from utility.util import sorted_key
 from utility.util import log
 from utility.util import LogLevel
+from utility.py2to3 import atoi, cmp
 
 class GpioObj(ModuleObj):
     def __init__(self):
@@ -41,7 +41,7 @@ class GpioObj(ModuleObj):
         self.__gpio_column_enable = True
 
     def get_cfgInfo(self):
-        cp = ConfigParser.ConfigParser(allow_no_value=True)
+        cp = configparser.ConfigParser(allow_no_value=True, strict=False)
         cp.read(ModuleObj.get_cmpPath())
 
         # get GPIO_FREQ section
@@ -71,7 +71,7 @@ class GpioObj(ModuleObj):
             GpioData._modeMap[op] = temp
 
             data = GpioData()
-            data.set_smtNum(string.atoi(list[len(list)-1]))
+            data.set_smtNum(atoi(list[len(list)-1]))
             ModuleObj.set_data(self, op.lower(), data)
 
         if cp.has_option('Chip Type', 'GPIO_COLUMN_ENABLE'):
@@ -84,7 +84,7 @@ class GpioObj(ModuleObj):
         for node in nodes:
             if node.nodeType == xml.dom.Node.ELEMENT_NODE:
                 if cmp(node.nodeName, 'count') == 0:
-                    GpioData._count = string.atoi(node.childNodes[0].nodeValue)
+                    GpioData._count = atoi(node.childNodes[0].nodeValue)
                     continue
 
                 eintNode = node.getElementsByTagName('eint_mode')
@@ -103,7 +103,7 @@ class GpioObj(ModuleObj):
                 iesNode = node.getElementsByTagName('ies')
                 drvCurNode = node.getElementsByTagName('drv_cur')
 
-                num = string.atoi(node.nodeName[4:])
+                num = atoi(node.nodeName[4:])
                 if num >= len(ModuleObj.get_data(self)):
                     break
                 data = ModuleObj.get_data(self)[node.nodeName]
@@ -115,7 +115,7 @@ class GpioObj(ModuleObj):
                     data.set_eintMode(flag)
 
                 if len(defmNode):
-                    data.set_defMode(string.atoi(defmNode[0].childNodes[0].nodeValue))
+                    data.set_defMode(atoi(defmNode[0].childNodes[0].nodeValue))
 
                 if len(modsNode) != 0  and len(modsNode[0].childNodes) != 0:
                     str = modsNode[0].childNodes[0].nodeValue
@@ -676,8 +676,8 @@ class GpioObj_MT6739(GpioObj_MT6759):
         GpioObj_MT6759.__init__(self)
 
     def get_eint_index(self, gpio_index):
-        if string.atoi(gpio_index) in GpioData._map_table.keys():
-            return GpioData._map_table[string.atoi(gpio_index)]
+        if atoi(gpio_index) in GpioData._map_table.keys():
+            return GpioData._map_table[atoi(gpio_index)]
         return -1
 
     def fill_pinctrl_hFile(self):
@@ -727,7 +727,7 @@ class GpioObj_MT6771(GpioObj_MT6739):
             if "GPIO_INIT_NO_COVER" in value.get_varNames():
                 continue
 
-            num = string.atoi(key[4:])
+            num = atoi(key[4:])
             defMode = value.get_defMode()
             dout = 1 if value.get_outHigh() else 0
             pullEn = 1 if value.get_inPullEn() else 0
@@ -749,7 +749,7 @@ class GpioObj_MT6763(GpioObj_MT6759):
         for key in sorted_key(ModuleObj.get_data(self).keys()):
             value = ModuleObj.get_data(self)[key]
 
-            num = string.atoi(key[4:])
+            num = atoi(key[4:])
             defMode = value.get_defMode()
             dout = 1 if value.get_outHigh() else 0
             pullEn = 1 if value.get_inPullEn() else 0

@@ -13,16 +13,16 @@
 # See http://www.gnu.org/licenses/gpl-2.0.html for more details.
 
 import re
-import string
 import xml.dom.minidom
-import ConfigParser
+import configparser
 
-from ModuleObj import ModuleObj
+from .ModuleObj import ModuleObj
 #from utility import util
 from utility.util import sorted_key
+from utility.py2to3 import atoi, cmp
 from data.I2cData import I2cData
 from data.I2cData import BusData
-import ChipObj
+from obj import ChipObj
 
 class I2cObj(ModuleObj):
     _busList = []
@@ -33,11 +33,11 @@ class I2cObj(ModuleObj):
         #self.__bBusEnable = True
 
     def get_cfgInfo(self):
-        cp = ConfigParser.ConfigParser(allow_no_value=True)
+        cp = configparser.ConfigParser(allow_no_value=True, strict=False)
         cp.read(ModuleObj.get_figPath())
 
-        I2cData._i2c_count = string.atoi(cp.get('I2C', 'I2C_COUNT'))
-        I2cData._channel_count = string.atoi(cp.get('I2C', 'CHANNEL_COUNT'))
+        I2cData._i2c_count = atoi(cp.get('I2C', 'I2C_COUNT'))
+        I2cData._channel_count = atoi(cp.get('I2C', 'CHANNEL_COUNT'))
 
         if cp.has_option('Chip Type', 'I2C_BUS'):
             flag = cp.get('Chip Type', 'I2C_BUS')
@@ -128,7 +128,7 @@ class I2cObj(ModuleObj):
 
 
             if self._bBusEnable:
-                gen_str += '''\tclock-frequency = <%d>;\n''' %(string.atoi(self._busList[i].get_speed()) * 1000)
+                gen_str += '''\tclock-frequency = <%d>;\n''' %(atoi(self._busList[i].get_speed()) * 1000)
                 temp_str = ''
 
                 if cmp(self._busList[i].get_enable(), 'false') == 0:
@@ -175,7 +175,7 @@ class I2cObj_MT6759(I2cObj):
 
 
             if self._bBusEnable:
-                gen_str += '''\tclock-frequency = <%d>;\n''' %(string.atoi(self._busList[i].get_speed()) * 1000)
+                gen_str += '''\tclock-frequency = <%d>;\n''' %(atoi(self._busList[i].get_speed()) * 1000)
                 temp_str = ''
 
                 if cmp(self._busList[i].get_enable(), 'false') == 0:
@@ -213,7 +213,7 @@ class I2cObj_MT6775(I2cObj):
 
 
             if self._bBusEnable:
-                gen_str += '''\tclock-frequency = <%d>;\n''' %(string.atoi(self._busList[i].get_speed()) * 1000)
+                gen_str += '''\tclock-frequency = <%d>;\n''' %(atoi(self._busList[i].get_speed()) * 1000)
                 temp_str = ''
 
                 if cmp(self._busList[i].get_enable(), 'false') == 0:
